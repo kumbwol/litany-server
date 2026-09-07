@@ -5,7 +5,7 @@ export class ServerApi {
 
     constructor() {
         this.server = new WebSocketServer({
-            port: Number(process.env.PORT); //3001
+            port: Number(process.env.PORT) //3001
         });
 
         console.log("server api is ready");
