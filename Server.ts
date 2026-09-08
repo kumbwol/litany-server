@@ -22,13 +22,15 @@ export class Server {
                     break;
 
                 case MessageType.CLOSE:
-                    console.log("close");
+                    this.room.forEach((room: Room) => {
+                        room.removePlayer(socket);
+                    });
                     break;
             }
 
             console.log("--------");
             this.room.forEach((room: Room) => {
-                console.log("kakasz22")
+                console.log("kakasz22", room.getPlayers().size)
                 //console.log(room.getPlayers());
             });
         });
