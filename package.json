@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node Main.ts"
+    "dev": "tsx watch Main.ts",
+    "start": "node ./dist/Main.js"
   },
   "repository": {
     "type": "git",
@@ -14,5 +14,10 @@
   "private": true,
   "dependencies": {
     "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   }
 }

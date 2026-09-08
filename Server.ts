@@ -1,29 +1,35 @@
-import {ServerApi} from "./ServerApi.ts";
-import type {DataParser} from "./DataParser";
-import {Player} from "./Player.ts";
-import {WebSocketServer} from "ws";
+import {ServerApi} from "./ServerApi";
+import type {DataParser} from "./DataParser.ts";
+import {MessageType} from "./DataParser";
+import {WebSocket} from "ws";
+import {Room} from "./Room";
 
 export class Server {
-    private players = new Map<string, Player>();
+    private room = new Map<string, Room>();
 
     constructor(api: ServerApi) {
-        api.onMessage((message: DataParser | string, socket: WebSocketServer) => {
-            if(message === "1001") {
-                for(let key of this.players.keys()) {
-                    if(this.players.get(key).socket === socket) {
-                        this.players.delete(key);
+        api.onMessage((message: DataParser, socket: WebSocket) => {
+            switch (message.type) {
+                case MessageType.ENTER:
+                    const roomId = message.roomId;
+                    const playerName = message.playerName;
+
+                    if(!this.room.has(roomId)) {
+                        this.room.set(roomId, new Room());
                     }
-                }
-            } else {
-                const playerName = message.playerName;
-                if(!this.players.has(message)) {
-                    this.players.set(playerName, new Player(playerName, socket));
-                }
+
+                    this.room.get(roomId)!.addPlayer(playerName, socket);
+                    break;
+
+                case MessageType.CLOSE:
+                    console.log("close");
+                    break;
             }
 
             console.log("--------");
-            this.players.forEach((player: Player) => {
-                console.log(player.name);
+            this.room.forEach((room: Room) => {
+                console.log("kakasz22")
+                //console.log(room.getPlayers());
             });
         });
 

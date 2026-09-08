@@ -1,5 +1,6 @@
-import {WebSocketServer} from "ws";
+import {WebSocketServer, WebSocket} from "ws";
 import type {DataParser} from "./DataParser.ts";
+import {MessageType} from "./DataParser";
 
 export class ServerApi {
     private server: WebSocketServer;
@@ -13,15 +14,19 @@ export class ServerApi {
         console.log("server api is ready");
     }
 
-    public onMessage(callback: (message: DataParser | string, socket: WebSocketServer) => void) {
-        this.server.on("connection", socket => {
-            socket.on("message", (data) => {
-                const message: DataParser = JSON.parse(data.toString());
+    public onMessage(callback: (message: DataParser, socket: WebSocket) => void) {
+        this.server.on("connection", (socket: WebSocket) => {
+            socket.on("message", (data: string) => {
+                const type = MessageType.ENTER;
+                const parsedData = JSON.parse(data);
+                const message: DataParser = {type, roomId: parsedData.roomId, playerName: parsedData.playerName} ;
                 callback(message, socket);
             });
 
-            socket.on("close", (data) => {
-                callback(data.toString(), socket);
+            socket.on("close", (data: string) => {
+                const type = MessageType.CLOSE;
+                const message: DataParser = {type};
+                callback(message, socket);
             });
         });
     }

@@ -1,5 +1,5 @@
-import {Server} from "./Server.ts";
-import {ServerApi} from "./ServerApi.ts";
+import {Server} from "./Server";
+import {ServerApi} from "./ServerApi";
 
 export class ServerMain {
     constructor() {

@@ -1,3 +1,5 @@
+import {WebSocket} from "ws";
+
 export class Player {
     public name: string;
     public socket: WebSocket;
