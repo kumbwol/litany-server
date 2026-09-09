@@ -1,11 +1,14 @@
 import {Player} from "./Player";
 import {WebSocket} from "ws";
-import {Card} from "./card/Card";
+import {ServerDataParser, ServerMessageType} from "./DataParser";
+import {ItemCard} from "./card/ItemCard";
 
 export class Room {
     private players = new Map<string, Player>();
-    private deck: Card[] = [];
+    private deck: ItemCard[] = [];
     private isGameStarted = false;
+    private player1!: Player;
+    private player2!: Player;
 
     constructor() {
 
@@ -29,10 +32,17 @@ export class Room {
 
     public addPlayer(playerName: string, socket: WebSocket) {
         if(!this.players.has(playerName) && this.players.size < 2) {
-            this.players.set(playerName, new Player(playerName, socket));
+            const player = new Player(playerName, socket);
+            if(!this.player1) {
+                this.player1 = player;
+            } else {
+                this.player2 = player;
+            }
+            this.players.set(playerName, player);
         }
 
         if(this.players.size === 2 && !this.isGameStarted) {
+            console.log("namesssss", this.player1.name, this.player2.name);
             this.startGame()
         }
     }
@@ -46,20 +56,32 @@ export class Room {
         this.isGameStarted = true;
         this.createDeck();
 
-        this.players.forEach((player: Player) => {
-            this.drawCards(player, 5, this.deck);
-            this.sendCards(player);
-        });
+        this.drawCards(this.player1, 5, this.deck);
+        this.drawCards(this.player2, 5, this.deck);
+
+        this.init(this.player1, this.getObfuscatedOpponentCards(this.player2));
+        this.init(this.player2, this.getObfuscatedOpponentCards(this.player1));
     }
 
-    private sendCards(player: Player) {
-        player.socket.send(JSON.stringify({
-            type: "CARDS_DEALT",
-            cards: player.hand
-        }));
+    private getObfuscatedOpponentCards(player: Player): ItemCard[] {
+        const obfuscatedHand = [];
+        for(let i=0; i<player.hand.length; i++) {
+            obfuscatedHand.push(new ItemCard());
+        }
+        return obfuscatedHand;
     }
 
-    private drawCards(player: Player, numberOfCards: number, deck: Card[]) {
+    private init(player: Player, opponentCards: ItemCard[]) {
+        const data: ServerDataParser = {
+            type: ServerMessageType.INIT,
+            playerHand: player.hand,
+            opponentHand: opponentCards,
+        };
+        player.socket.send(JSON.stringify(data));
+    }
+
+    private drawCards(player: Player, numberOfCards: number, deck: ItemCard[]) {
+        console.log("pakli:", deck.length);
         for(let i=0; i<numberOfCards; i++) {
             if(deck.length > 0) {
                 const card = deck.pop();
@@ -70,7 +92,7 @@ export class Room {
 
     private createDeck() {
         for(let i=0; i<20; i++) {
-            this.deck.push(new Card(Math.floor(Math.random() * 5)));
+            this.deck.push(new ItemCard(Math.floor(Math.random() * 5)));
         }
     }
 }

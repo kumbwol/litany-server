@@ -1,10 +1,10 @@
 import {WebSocket} from "ws";
-import {Card} from "./card/Card";
+import {ItemCard} from "./card/ItemCard";
 
 export class Player {
     public name: string;
     public socket: WebSocket;
-    public hand: Card[] = [];
+    public hand: ItemCard[] = [];
 
     constructor(name: string, socket: WebSocket) {
         this.name = name;

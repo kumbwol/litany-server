@@ -1,6 +1,6 @@
 import {ServerApi} from "./ServerApi";
-import type {DataParser} from "./DataParser.ts";
-import {MessageType} from "./DataParser";
+import type {ClientDataParser} from "./DataParser.ts";
+import {ClientMessageType} from "./DataParser";
 import {WebSocket} from "ws";
 import {Room} from "./Room";
 
@@ -8,9 +8,9 @@ export class Server {
     private room = new Map<string, Room>();
 
     constructor(api: ServerApi) {
-        api.onMessage((message: DataParser, socket: WebSocket) => {
+        api.onMessage((message: ClientDataParser, socket: WebSocket) => {
             switch (message.type) {
-                case MessageType.ENTER:
+                case ClientMessageType.ENTER:
                     const roomId = message.roomId;
                     const playerName = message.playerName;
 
@@ -21,7 +21,7 @@ export class Server {
                     this.room.get(roomId)!.addPlayer(playerName, socket);
                     break;
 
-                case MessageType.CLOSE:
+                case ClientMessageType.CLOSE:
                     this.room.forEach((room: Room) => {
                         room.removePlayer(socket);
                     });

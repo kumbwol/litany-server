@@ -14,6 +14,7 @@ export enum DivinityTypes {
 }
 
 export enum ItemTypes {
+    UNKNOWN = -1,
     BOOK,
     HOURGLASS,
     PYRAMID,
