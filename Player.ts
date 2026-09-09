@@ -10,4 +10,8 @@ export class Player {
         this.name = name;
         this.socket = socket;
     }
+
+    public removeCardFromHand() {
+        this.hand.pop();
+    }
 }

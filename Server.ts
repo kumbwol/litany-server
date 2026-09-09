@@ -1,8 +1,9 @@
 import {ServerApi} from "./ServerApi";
-import type {ClientDataParser} from "./DataParser.ts";
+import {ClientDataParser, ServerDataParser, ServerMessageType} from "./DataParser";
 import {ClientMessageType} from "./DataParser";
 import {WebSocket} from "ws";
 import {Room} from "./Room";
+import {Player} from "./Player";
 
 export class Server {
     private room = new Map<string, Room>();
@@ -11,14 +12,21 @@ export class Server {
         api.onMessage((message: ClientDataParser, socket: WebSocket) => {
             switch (message.type) {
                 case ClientMessageType.ENTER:
-                    const roomId = message.roomId;
-                    const playerName = message.playerName;
-
-                    if(!this.room.has(roomId)) {
-                        this.room.set(roomId, new Room());
+                    if(!this.room.has(message.roomId)) {
+                        this.room.set(message.roomId, new Room());
                     }
 
-                    this.room.get(roomId)!.addPlayer(playerName, socket);
+                    this.room.get(message.roomId)!.addPlayer(message.playerName, socket);
+                    break;
+
+                case ClientMessageType.PLAY_CARD:
+                    this.room.get(message.roomId)!.getPlayer(message.playerName).removeCardFromHand();
+
+                    const data: ServerDataParser = {
+                        type: ServerMessageType.CHANGE_OPPONENT_HAND,
+                        opponentHand: this.room.get(message.roomId)!.getPlayer(message.playerName)!.hand,
+                    };
+                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(data));
                     break;
 
                 case ClientMessageType.CLOSE:
@@ -30,7 +38,7 @@ export class Server {
 
             console.log("--------");
             this.room.forEach((room: Room) => {
-                console.log("kakasz22", room.getPlayers().size)
+                console.log("kakasz22", room.getPlayers().size);
                 //console.log(room.getPlayers());
             });
         });

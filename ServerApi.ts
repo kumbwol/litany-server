@@ -17,10 +17,8 @@ export class ServerApi {
     public onMessage(callback: (message: ClientDataParser, socket: WebSocket) => void) {
         this.server.on("connection", (socket: WebSocket) => {
             socket.on("message", (data: string) => {
-                const type = ClientMessageType.ENTER;
-                const parsedData = JSON.parse(data);
-                const message: ClientDataParser = {type, roomId: parsedData.roomId, playerName: parsedData.playerName} ;
-                callback(message, socket);
+                const parsedData: ClientDataParser = JSON.parse(data);
+                callback(parsedData, socket);
             });
 
             socket.on("close", (data: string) => {

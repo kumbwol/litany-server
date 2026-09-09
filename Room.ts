@@ -26,8 +26,19 @@ export class Room {
         }
     }
 
-    public getPlayers() {
+    public getPlayers(): Map<string, Player> {
         return this.players;
+    }
+
+    public getOpponent(playerName: string): Player | undefined {
+        if(this.player1.name === playerName) {
+            return this.player2;
+        }
+        return this.player1;
+    }
+
+    public getPlayer(playerName: string): Player {
+        return this.players.get(playerName)!;
     }
 
     public addPlayer(playerName: string, socket: WebSocket) {
@@ -43,7 +54,7 @@ export class Room {
 
         if(this.players.size === 2 && !this.isGameStarted) {
             console.log("namesssss", this.player1.name, this.player2.name);
-            this.startGame()
+            this.startGame();
         }
     }
 
