@@ -13,6 +13,18 @@ export enum DivinityTypes {
     SUBJECTION
 }
 
+export enum LamentTypes {
+    UNKNOWN = -1,
+    CHOICE,
+    DOMINION,
+    FAITH,
+    IGNORANCE,
+    INTERFERENCE,
+    LOSS,
+    REVENGE,
+    SOLITUDE,
+}
+
 export enum ItemTypes {
     UNKNOWN = -1,
     BOOK,

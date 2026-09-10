@@ -1,4 +1,5 @@
 import {ItemCard} from "./card/ItemCard";
+import {LamentCard} from "./card/LamentCard";
 
 export enum ClientMessageType {
     ENTER,
@@ -22,5 +23,5 @@ export type ClientDataParser =
     | ({ type: ClientMessageType.PLAY_CARD } & PlayerContext);
 
 export type ServerDataParser =
-    | { type: ServerMessageType.INIT, playerHand: ItemCard[]; opponentHand: ItemCard[]; }
-    | { type: ServerMessageType.CHANGE_OPPONENT_HAND, opponentHand: ItemCard[]; }
+    | { type: ServerMessageType.INIT, playerHand: (ItemCard | LamentCard)[]; opponentHand: (ItemCard | LamentCard)[]; }
+    | { type: ServerMessageType.CHANGE_OPPONENT_HAND, opponentHand: (ItemCard | LamentCard)[]; }

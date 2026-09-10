@@ -2,10 +2,12 @@ import {Player} from "./Player";
 import {WebSocket} from "ws";
 import {ServerDataParser, ServerMessageType} from "./DataParser";
 import {ItemCard} from "./card/ItemCard";
+import {LamentCard} from "./card/LamentCard";
+import {CardTypes} from "./card/CardTypes";
 
 export class Room {
     private players = new Map<string, Player>();
-    private deck: ItemCard[] = [];
+    private deck: (ItemCard | LamentCard)[] = [];
     private isGameStarted = false;
     private player1: Player | undefined;
     private player2: Player | undefined;
@@ -75,15 +77,19 @@ export class Room {
         this.init(this.player2!, this.getObfuscatedOpponentCards(this.player1!));
     }
 
-    private getObfuscatedOpponentCards(player: Player): ItemCard[] {
+    private getObfuscatedOpponentCards(player: Player): (ItemCard | LamentCard)[] {
         const obfuscatedHand = [];
         for(let i=0; i<player.hand.length; i++) {
-            obfuscatedHand.push(new ItemCard());
+            if(player.hand[i].type === CardTypes.ITEM) {
+                obfuscatedHand.push(new ItemCard());
+            } else if(player.hand[i].type === CardTypes.LAMENT) {
+                obfuscatedHand.push(new LamentCard());
+            }
         }
         return obfuscatedHand;
     }
 
-    private init(player: Player, opponentCards: ItemCard[]) {
+    private init(player: Player, opponentCards: (ItemCard | LamentCard)[]) {
         const data: ServerDataParser = {
             type: ServerMessageType.INIT,
             playerHand: player.hand,
@@ -92,7 +98,7 @@ export class Room {
         player.socket.send(JSON.stringify(data));
     }
 
-    private drawCards(player: Player, numberOfCards: number, deck: ItemCard[]) {
+    private drawCards(player: Player, numberOfCards: number, deck: (ItemCard | LamentCard)[]) {
         console.log("pakli:", deck.length);
         for(let i=0; i<numberOfCards; i++) {
             if(deck.length > 0) {
@@ -104,7 +110,8 @@ export class Room {
 
     private createDeck() {
         for(let i=0; i<20; i++) {
-            this.deck.push(new ItemCard(Math.floor(Math.random() * 5)));
+            const randomId = Math.floor(Math.random() * 5);
+            this.deck.push(Math.random() < 0.5 ? new LamentCard(randomId) : new ItemCard(randomId));
         }
     }
 }
