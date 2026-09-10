@@ -7,8 +7,8 @@ export class Room {
     private players = new Map<string, Player>();
     private deck: ItemCard[] = [];
     private isGameStarted = false;
-    private player1!: Player;
-    private player2!: Player;
+    private player1: Player | undefined;
+    private player2: Player | undefined;
 
     constructor() {
 
@@ -31,10 +31,10 @@ export class Room {
     }
 
     public getOpponent(playerName: string): Player | undefined {
-        if(this.player1.name === playerName) {
+        if(this.player1!.name === playerName) {
             return this.player2;
         }
-        return this.player1;
+        return this.player1!;
     }
 
     public getPlayer(playerName: string): Player {
@@ -53,7 +53,7 @@ export class Room {
         }
 
         if(this.players.size === 2 && !this.isGameStarted) {
-            console.log("namesssss", this.player1.name, this.player2.name);
+            console.log("namesssss", this.player1!.name, this.player2!.name);
             this.startGame();
         }
     }
@@ -61,17 +61,18 @@ export class Room {
     private resetRoom() {
         this.deck = [];
         this.isGameStarted = false;
+        this.player1 = this.player2 = undefined;
     }
 
     private startGame() {
         this.isGameStarted = true;
         this.createDeck();
 
-        this.drawCards(this.player1, 5, this.deck);
-        this.drawCards(this.player2, 5, this.deck);
+        this.drawCards(this.player1!, 5, this.deck);
+        this.drawCards(this.player2!, 5, this.deck);
 
-        this.init(this.player1, this.getObfuscatedOpponentCards(this.player2));
-        this.init(this.player2, this.getObfuscatedOpponentCards(this.player1));
+        this.init(this.player1!, this.getObfuscatedOpponentCards(this.player2!));
+        this.init(this.player2!, this.getObfuscatedOpponentCards(this.player1!));
     }
 
     private getObfuscatedOpponentCards(player: Player): ItemCard[] {
