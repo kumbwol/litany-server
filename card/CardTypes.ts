@@ -5,6 +5,7 @@ export enum CardTypes {
 }
 
 export enum DivinityTypes {
+    UNKNOWN = -1,
     WISDOM,
     STRENGTH,
     FREEDOM,

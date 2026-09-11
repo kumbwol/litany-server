@@ -4,10 +4,14 @@ import {ServerDataParser, ServerMessageType} from "./DataParser";
 import {ItemCard} from "./card/ItemCard";
 import {LamentCard} from "./card/LamentCard";
 import {CardTypes} from "./card/CardTypes";
+import {Card} from "./card/Card";
+import {DivinityCard} from "./card/DivinityCard";
 
 export class Room {
     private players = new Map<string, Player>();
-    private deck: (ItemCard | LamentCard)[] = [];
+    private itemDeck: ItemCard[] = [];
+    private lamentDeck: LamentCard[] = [];
+    private divinityDeck: DivinityCard[] = [];
     private isGameStarted = false;
     private player1: Player | undefined;
     private player2: Player | undefined;
@@ -61,17 +65,22 @@ export class Room {
     }
 
     private resetRoom() {
-        this.deck = [];
+        this.itemDeck = [];
         this.isGameStarted = false;
         this.player1 = this.player2 = undefined;
     }
 
     private startGame() {
         this.isGameStarted = true;
-        this.createDeck();
+        this.itemDeck = this.createDeck(CardTypes.ITEM) as ItemCard[];
+        this.lamentDeck = this.createDeck(CardTypes.LAMENT) as LamentCard[];
+        this.divinityDeck = this.createDeck(CardTypes.DIVINITY) as DivinityCard[];
 
-        this.drawCards(this.player1!, 5, this.deck);
-        this.drawCards(this.player2!, 5, this.deck);
+        this.shuffleDeck(this.lamentDeck);
+        this.shuffleDeck(this.divinityDeck);
+
+        this.drawCards(this.player1!, 5, this.itemDeck);
+        this.drawCards(this.player2!, 5, this.itemDeck);
 
         this.init(this.player1!, this.getObfuscatedOpponentCards(this.player2!));
         this.init(this.player2!, this.getObfuscatedOpponentCards(this.player1!));
@@ -94,6 +103,7 @@ export class Room {
             type: ServerMessageType.INIT,
             playerHand: player.hand,
             opponentHand: opponentCards,
+            divinityCards: this.divinityDeck
         };
         player.socket.send(JSON.stringify(data));
     }
@@ -108,10 +118,38 @@ export class Room {
         }
     }
 
-    private createDeck() {
-        for(let i=0; i<20; i++) {
-            const randomId = Math.floor(Math.random() * 5);
-            this.deck.push(Math.random() < 0.5 ? new LamentCard(randomId) : new ItemCard(randomId));
+    private createDeck(cardType: CardTypes): Card[] {
+        const deck: Card[] = [];
+        switch (cardType) {
+            case CardTypes.ITEM:
+                for(let i=0; i<20; i++) {
+                    const randomId = Math.floor(Math.random() * 5);
+                    deck.push(new ItemCard(randomId));
+                }
+                break;
+
+            case CardTypes.LAMENT:
+                for(let i=0; i<8; i++) {
+                    deck.push(new LamentCard(i));
+                }
+                break;
+
+            case CardTypes.DIVINITY:
+                for(let i=0; i<6; i++) {
+                    deck.push(new DivinityCard(i));
+                }
+                break;
         }
+        return deck;
+    }
+
+    private shuffleDeck(deck: Card[]) {
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+
+        return deck;
     }
 }
