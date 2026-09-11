@@ -3,7 +3,7 @@ import {WebSocket} from "ws";
 import {ServerDataParser, ServerMessageType} from "./DataParser";
 import {ItemCard} from "./card/ItemCard";
 import {LamentCard} from "./card/LamentCard";
-import {CardTypes} from "./card/CardTypes";
+import {CardTypes, LamentTypes} from "./card/CardTypes";
 import {Card} from "./card/Card";
 import {DivinityCard} from "./card/DivinityCard";
 
@@ -43,6 +43,11 @@ export class Room {
         return this.player1!;
     }
 
+    public swapPlayerTurn() {
+        this.player1!.isFirstPlayer = !this.player1!.isFirstPlayer;
+        this.player2!.isFirstPlayer = !this.player2!.isFirstPlayer;
+    }
+
     public getPlayer(playerName: string): Player {
         return this.players.get(playerName)!;
     }
@@ -78,6 +83,8 @@ export class Room {
 
         this.shuffleDeck(this.lamentDeck);
         this.shuffleDeck(this.divinityDeck);
+        this.lamentDeck.pop();
+        this.selectFirstPlayer();
 
         this.drawCards(this.player1!, 5, this.itemDeck);
         this.drawCards(this.player2!, 5, this.itemDeck);
@@ -86,7 +93,34 @@ export class Room {
         this.init(this.player2!, this.getObfuscatedOpponentCards(this.player1!));
     }
 
-    private getObfuscatedOpponentCards(player: Player): (ItemCard | LamentCard)[] {
+    private selectFirstPlayer() {
+        const rand = Math.floor(Math.random() * 2);
+        if(rand === 0) {
+            this.player1!.isFirstPlayer = true;
+        } else {
+            this.player2!.isFirstPlayer = true;
+        }
+    }
+
+    private getObfuscatedCards(cards: Card[]): Card[] {
+        const obfuscatedCards = [];
+        for(let i=0; i<cards.length; i++) {
+            if(cards[i].type === CardTypes.LAMENT) {
+                obfuscatedCards.push(new LamentCard());
+            }
+        }
+        return obfuscatedCards;
+    }
+
+    public removeCardsFromLamentDeck(pickCard: LamentTypes, discardCard: LamentTypes) {
+        for(let i = this.lamentDeck.length - 1; i >= 0; i--) {
+            if(this.lamentDeck[i].lamentType === pickCard || this.lamentDeck[i].lamentType === discardCard) {
+                this.lamentDeck.splice(i, 1);
+            }
+        }
+    }
+
+    public getObfuscatedOpponentCards(player: Player): (ItemCard | LamentCard)[] {
         const obfuscatedHand = [];
         for(let i=0; i<player.hand.length; i++) {
             if(player.hand[i].type === CardTypes.ITEM) {
@@ -98,12 +132,17 @@ export class Room {
         return obfuscatedHand;
     }
 
+    public getLamentDeck(): LamentCard[] {
+        return this.lamentDeck;
+    }
+
     private init(player: Player, opponentCards: (ItemCard | LamentCard)[]) {
         const data: ServerDataParser = {
             type: ServerMessageType.INIT,
             playerHand: player.hand,
             opponentHand: opponentCards,
-            divinityCards: this.divinityDeck
+            divinityCards: this.divinityDeck,
+            lamentDraftCards: player.isFirstPlayer ? this.lamentDeck : (this.getObfuscatedCards(this.lamentDeck) as LamentCard[])
         };
         player.socket.send(JSON.stringify(data));
     }
