@@ -56,7 +56,23 @@ export class Server {
                         };
                         this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(lamentData));
                     }
+                    break;
 
+                case ClientMessageType.NO_PLAYER_ACTION:
+                    this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = false;
+
+                    if(this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction === false &&
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction === false) {
+                            const actionsFinishedData: ServerDataParser = {
+                                type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
+                            };
+
+                            this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    }
                     break;
 
                 case ClientMessageType.CLOSE:

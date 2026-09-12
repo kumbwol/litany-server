@@ -7,6 +7,7 @@ export class Player {
     public socket: WebSocket;
     public hand: (ItemCard | LamentCard)[] = [];
     public isFirstPlayer: boolean = false;
+    public willDoAction: boolean | undefined = undefined;
 
     constructor(name: string, socket: WebSocket) {
         this.name = name;
