@@ -83,6 +83,7 @@ export class Room {
 
         this.shuffleDeck(this.lamentDeck);
         this.shuffleDeck(this.divinityDeck);
+        this.shuffleDeck(this.itemDeck);
         this.lamentDeck.pop();
         this.selectFirstPlayer();
 
@@ -161,9 +162,8 @@ export class Room {
         const deck: Card[] = [];
         switch (cardType) {
             case CardTypes.ITEM:
-                for(let i=0; i<20; i++) {
-                    const randomId = Math.floor(Math.random() * 5);
-                    deck.push(new ItemCard(randomId));
+                for(let i=0; i<46; i++) {
+                    deck.push(new ItemCard(i));
                 }
                 break;
 
