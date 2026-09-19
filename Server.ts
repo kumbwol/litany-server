@@ -58,20 +58,46 @@ export class Server {
                     }
                     break;
 
-                case ClientMessageType.NO_PLAYER_ACTION:
-                    this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = false;
+                case ClientMessageType.PLAYER_INITIATIVE_ACTION:
+                    console.log("isPlay:", message.isPlayActionRequested);
+                    this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = message.isPlayActionRequested;
 
-                    if(this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction === false &&
-                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction === false) {
-                            const actionsFinishedData: ServerDataParser = {
-                                type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
-                            };
+                    if(this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction === undefined || this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction === undefined) {
+                        return;
+                    }
 
-                            this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
-                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+                    const isPlayerTookAction = this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction === true;
+                    const isOpponentTookAction = this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction === true;
 
-                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
-                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    console.log(isPlayerTookAction, isOpponentTookAction)
+
+                    if(!isOpponentTookAction && !isPlayerTookAction) {
+                        const actionsFinishedData: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
+                        };
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    }
+
+                    if((isPlayerTookAction && !isOpponentTookAction) || (!isPlayerTookAction && isOpponentTookAction)) {
+
+                        const playerTakesAction: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_TAKES_ACTIONS,
+                        };
+
+                        const playerWaits: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_WAITS,
+                        };
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(isPlayerTookAction ? playerTakesAction : playerWaits));
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(isPlayerTookAction ? playerWaits : playerTakesAction));
                     }
                     break;
 
