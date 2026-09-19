@@ -1,6 +1,7 @@
 import {WebSocket} from "ws";
 import {ItemCard} from "./card/ItemCard";
 import {LamentCard} from "./card/LamentCard";
+import {CardTypes} from "./card/CardTypes";
 
 export class Player {
     public name: string;
@@ -19,6 +20,11 @@ export class Player {
     }
 
     public removeCardFromHand() {
-        this.hand.pop();
+        for(let i=this.hand.length-1;i>=0;i--) {
+            if(this.hand[i].type === CardTypes.ITEM) {
+                this.hand.splice(i, 1);
+                break;
+            }
+        }
     }
 }

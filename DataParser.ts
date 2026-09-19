@@ -1,7 +1,7 @@
 import {ItemCard} from "./card/ItemCard";
 import {LamentCard} from "./card/LamentCard";
 import {DivinityCard} from "./card/DivinityCard";
-import {LamentTypes} from "./card/CardTypes";
+import {ItemTypes, LamentTypes} from "./card/CardTypes";
 
 export enum ClientMessageType {
     ENTER,
@@ -19,6 +19,7 @@ export enum ServerMessageType {
     PLAYER_ACTIONS_FINISHED = "PLAYER_ACTIONS_FINISHED",
     PLAYER_TAKES_ACTIONS = "PLAYER_TAKES_ACTIONS",
     PLAYER_WAITS = "PLAYER_WAITS",
+    OPPONENT_PLAYED_CARD= "OPPONENT_PLAYED_CARD",
 }
 
 type PlayerContext = {
@@ -29,7 +30,7 @@ type PlayerContext = {
 export type ClientDataParser =
     | ({ type: ClientMessageType.ENTER } & PlayerContext)
     | { type: ClientMessageType.CLOSE }
-    | ({ type: ClientMessageType.PLAY_CARD } & PlayerContext)
+    | ({ type: ClientMessageType.PLAY_CARD, resource: number, itemType: ItemTypes } & PlayerContext)
     | ({ type: ClientMessageType.LAMENT_DRAFT_PLAYER_ACTION, pickCardType: LamentTypes, discardCardType: LamentTypes } & PlayerContext)
     | ({ type: ClientMessageType.PLAYER_INITIATIVE_ACTION, isPlayActionRequested: boolean } & PlayerContext)
 
@@ -41,3 +42,4 @@ export type ServerDataParser =
     | { type: ServerMessageType.PLAYER_ACTIONS_FINISHED }
     | { type: ServerMessageType.PLAYER_TAKES_ACTIONS }
     | { type: ServerMessageType.PLAYER_WAITS }
+    | { type: ServerMessageType.OPPONENT_PLAYED_CARD, opponentHand: (ItemCard | LamentCard)[], resource: number, itemType: ItemTypes; }

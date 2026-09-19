@@ -24,8 +24,10 @@ export class Server {
                     this.room.get(message.roomId)!.getPlayer(message.playerName).removeCardFromHand();
 
                     const data: ServerDataParser = {
-                        type: ServerMessageType.CHANGE_OPPONENT_HAND,
+                        type: ServerMessageType.OPPONENT_PLAYED_CARD,
                         opponentHand: this.room.get(message.roomId)!.getPlayer(message.playerName)!.hand,
+                        resource: message.resource,
+                        itemType: message.itemType
                     };
                     this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(data));
                     break;
