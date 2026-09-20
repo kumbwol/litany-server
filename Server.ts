@@ -69,15 +69,43 @@ export class Server {
                         this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(playerWaits));
                         this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(playerTakesAction));
                     } else {
-                        const actionsFinishedData: ServerDataParser = {
-                            type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
-                        };
-
                         this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
                         this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
 
-                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
-                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                        if(this.room.get(message.roomId)!.shouldLamentDraftStart()) {
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.removeLamentCardsFromHand();
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.removeLamentCardsFromHand();
+                            this.room.get(message.roomId)!.shuffleLamentCards();
+                            this.room.get(message.roomId)!.lamentDeck.pop();
+
+                            const playerHasInitiative = this.room.get(message.roomId)!.getPlayer(message.playerName)!.hasInitiative;
+                            const playerWithInitiative = playerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName)! : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+                            const playerWithPassive = !playerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName)! : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+
+                            const newLamentDraftInitiative: ServerDataParser = {
+                                type: ServerMessageType.NEW_LAMENT_DRAFT,
+                                lamentDraftCards: this.room.get(message.roomId)!.getLamentDeck(),
+                                playerHand: playerWithInitiative.hand,
+                                opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWithPassive),
+                            };
+
+                            const newLamentDraftPassive: ServerDataParser = {
+                                type: ServerMessageType.NEW_LAMENT_DRAFT,
+                                lamentDraftCards: this.room.get(message.roomId)!.getObfuscatedCards(this.room.get(message.roomId)!.getLamentDeck()),
+                                playerHand: playerWithPassive.hand,
+                                opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWithInitiative),
+                            };
+
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(playerHasInitiative ? newLamentDraftInitiative : newLamentDraftPassive));
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(playerHasInitiative ? newLamentDraftPassive : newLamentDraftInitiative));
+                        } else {
+                            const actionsFinishedData: ServerDataParser = {
+                                type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
+                            };
+
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                        }
                     }
                     break;
 
@@ -123,15 +151,43 @@ export class Server {
                     console.log(isPlayerTookAction, isOpponentTookAction)
 
                     if(!isOpponentTookAction && !isPlayerTookAction) {
-                        const actionsFinishedData: ServerDataParser = {
-                            type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
-                        };
-
                         this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
                         this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
 
-                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
-                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                        if(this.room.get(message.roomId)!.shouldLamentDraftStart()) {
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.removeLamentCardsFromHand();
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.removeLamentCardsFromHand();
+                            this.room.get(message.roomId)!.shuffleLamentCards();
+                            this.room.get(message.roomId)!.lamentDeck.pop();
+
+                            const playerHasInitiative = this.room.get(message.roomId)!.getPlayer(message.playerName)!.hasInitiative;
+                            const playerWithInitiative = playerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName)! : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+                            const playerWithPassive = !playerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName)! : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+
+                            const newLamentDraftInitiative: ServerDataParser = {
+                                type: ServerMessageType.NEW_LAMENT_DRAFT,
+                                lamentDraftCards: this.room.get(message.roomId)!.getLamentDeck(),
+                                playerHand: playerWithInitiative.hand,
+                                opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWithPassive),
+                            };
+
+                            const newLamentDraftPassive: ServerDataParser = {
+                                type: ServerMessageType.NEW_LAMENT_DRAFT,
+                                lamentDraftCards: this.room.get(message.roomId)!.getObfuscatedCards(this.room.get(message.roomId)!.getLamentDeck()),
+                                playerHand: playerWithPassive.hand,
+                                opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWithInitiative),
+                            };
+
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(playerHasInitiative ? newLamentDraftInitiative : newLamentDraftPassive));
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(playerHasInitiative ? newLamentDraftPassive : newLamentDraftInitiative));
+                        } else {
+                            const actionsFinishedData: ServerDataParser = {
+                                type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
+                            };
+
+                            this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                            this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                        }
                     }
 
                     if((isPlayerTookAction && !isOpponentTookAction) || (!isPlayerTookAction && isOpponentTookAction)) {

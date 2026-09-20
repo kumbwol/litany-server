@@ -17,6 +17,7 @@ export enum ClientMessageType {
 export enum ServerMessageType {
     INIT = "INIT",
     CHANGE_OPPONENT_HAND= "CHANGE_OPPONENT_HAND",
+    NEW_LAMENT_DRAFT = "NEW_LAMENT_DRAFT",
     LAMENT_DRAFT_SERVER_ACTION = "LAMENT_DRAFT_SERVER_ACTION",
     LAMENT_DRAFT_END = "LAMENT_DRAFT_END",
     PLAYER_ACTIONS_FINISHED = "PLAYER_ACTIONS_FINISHED",
@@ -45,6 +46,7 @@ export type ClientDataParser =
 export type ServerDataParser =
     | { type: ServerMessageType.INIT, playerHand: (ItemCard | LamentCard)[], opponentHand: (ItemCard | LamentCard)[], divinityCards: DivinityCard[], lamentDraftCards: LamentCard[]; }
     | { type: ServerMessageType.CHANGE_OPPONENT_HAND, opponentHand: (ItemCard | LamentCard)[]; }
+    | { type: ServerMessageType.NEW_LAMENT_DRAFT, lamentDraftCards: LamentCard[], playerHand: (ItemCard | LamentCard)[], opponentHand: (ItemCard | LamentCard)[]; }
     | { type: ServerMessageType.LAMENT_DRAFT_SERVER_ACTION, lamentDraftCards: LamentCard[]; }
     | { type: ServerMessageType.LAMENT_DRAFT_END, playerHand: (ItemCard | LamentCard)[], opponentHand: (ItemCard | LamentCard)[]; }
     | { type: ServerMessageType.PLAYER_ACTIONS_FINISHED }

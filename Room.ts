@@ -15,9 +15,15 @@ export class Room {
     private isGameStarted = false;
     private player1: Player | undefined;
     private player2: Player | undefined;
+    private roundId = 0;
 
     constructor() {
 
+    }
+
+    public shouldLamentDraftStart() {
+        this.roundId = (this.roundId + 1) % 6;
+        return (this.roundId === 0);
     }
 
     public removePlayer(socket: WebSocket) {
@@ -105,7 +111,7 @@ export class Room {
         }
     }
 
-    private getObfuscatedCards(cards: Card[]): Card[] {
+    public getObfuscatedCards(cards: Card[]): Card[] {
         const obfuscatedCards = [];
         for(let i=0; i<cards.length; i++) {
             if(cards[i].type === CardTypes.LAMENT) {
@@ -187,6 +193,11 @@ export class Room {
     public putBackDestroyedCardToDeck(itemType: ItemTypes) {
         this.itemDeck.push(new ItemCard(itemType));
         this.shuffleDeck(this.itemDeck);
+    }
+
+    public shuffleLamentCards() {
+        this.lamentDeck = this.createDeck(CardTypes.LAMENT) as LamentCard[];
+        this.shuffleDeck(this.lamentDeck);
     }
 
     private shuffleDeck(deck: Card[]) {

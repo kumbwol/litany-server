@@ -28,4 +28,12 @@ export class Player {
             }
         }
     }
+
+    public removeLamentCardsFromHand() {
+        for(let i = this.hand.length - 1; i >= 0; i--) {
+            if(this.hand[i].type === CardTypes.LAMENT) {
+                this.hand.splice(i, 1);
+            }
+        }
+    }
 }
