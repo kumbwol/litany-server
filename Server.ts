@@ -32,6 +32,34 @@ export class Server {
                     this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(data));
                     break;
 
+                case ClientMessageType.DESTROY_CARD:
+                    const destroyData: ServerDataParser = {
+                        type: ServerMessageType.OPPONENT_DESTROYED_CARD,
+                        index: message.index,
+                    };
+                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(destroyData));
+                    break;
+
+                case ClientMessageType.COLLECT_RESOURCES:
+                    const collectData: ServerDataParser = {
+                        type: ServerMessageType.OPPONENT_COLLECTED_RESOURCES,
+                        resource: message.resource,
+                    };
+                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(collectData));
+                    break;
+
+                case ClientMessageType.PASS_TURN:
+                    const actionsFinishedData: ServerDataParser = {
+                        type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
+                    };
+
+                    this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
+                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+
+                    this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    break;
+
                 case ClientMessageType.LAMENT_DRAFT_PLAYER_ACTION:
                     this.room.get(message.roomId)!.removeCardsFromLamentDeck(message.pickCardType, message.discardCardType);
                     this.room.get(message.roomId)!.getPlayer(message.playerName).addCardToHand(new LamentCard(message.pickCardType));
