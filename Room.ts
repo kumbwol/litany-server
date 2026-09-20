@@ -98,8 +98,10 @@ export class Room {
         const rand = Math.floor(Math.random() * 2);
         if(rand === 0) {
             this.player1!.isFirstPlayer = true;
+            this.player1!.hasInitiative = true;
         } else {
             this.player2!.isFirstPlayer = true;
+            this.player2!.hasInitiative = true;
         }
     }
 

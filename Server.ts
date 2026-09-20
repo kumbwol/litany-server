@@ -49,15 +49,35 @@ export class Server {
                     break;
 
                 case ClientMessageType.PASS_TURN:
-                    const actionsFinishedData: ServerDataParser = {
-                        type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
-                    };
-
                     this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
-                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
 
-                    this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
-                    this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    if(this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction) {
+                        const playerTakesAction: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_TAKES_ACTIONS,
+                            hasInitiative: this.room.get(message.roomId)!.getOpponent(message.playerName)!.hasInitiative
+                        };
+
+                        const playerWaits: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_WAITS,
+                            hasInitiative: this.room.get(message.roomId)!.getPlayer(message.playerName).hasInitiative
+                        };
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(playerWaits));
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(playerTakesAction));
+                    } else {
+                        const actionsFinishedData: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_ACTIONS_FINISHED,
+                        };
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = undefined;
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(actionsFinishedData));
+                    }
                     break;
 
                 case ClientMessageType.LAMENT_DRAFT_PLAYER_ACTION:
@@ -114,13 +134,17 @@ export class Server {
                     }
 
                     if((isPlayerTookAction && !isOpponentTookAction) || (!isPlayerTookAction && isOpponentTookAction)) {
+                        this.room.get(message.roomId)!.getPlayer(message.playerName).hasInitiative = isPlayerTookAction;
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.hasInitiative = isOpponentTookAction;
 
                         const playerTakesAction: ServerDataParser = {
                             type: ServerMessageType.PLAYER_TAKES_ACTIONS,
+                            hasInitiative: true,
                         };
 
                         const playerWaits: ServerDataParser = {
                             type: ServerMessageType.PLAYER_WAITS,
+                            hasInitiative: false,
                         };
 
                         this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
@@ -128,6 +152,26 @@ export class Server {
 
                         this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(isPlayerTookAction ? playerTakesAction : playerWaits));
                         this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(isPlayerTookAction ? playerWaits : playerTakesAction));
+                    }
+
+                    if(isPlayerTookAction && isOpponentTookAction) {
+                        const isPlayerHasInitiative = this.room.get(message.roomId)!.getPlayer(message.playerName).hasInitiative;
+
+                        const playerTakesAction: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_TAKES_ACTIONS,
+                            hasInitiative: true,
+                        };
+
+                        const playerWaits: ServerDataParser = {
+                            type: ServerMessageType.PLAYER_WAITS,
+                            hasInitiative: false,
+                        };
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = true;
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction = true;
+
+                        this.room.get(message.roomId)!.getPlayer(message.playerName)!.socket.send(JSON.stringify(isPlayerHasInitiative ? playerTakesAction : playerWaits));
+                        this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(!isPlayerHasInitiative ? playerTakesAction : playerWaits));
                     }
                     break;
 

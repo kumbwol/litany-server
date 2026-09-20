@@ -48,8 +48,8 @@ export type ServerDataParser =
     | { type: ServerMessageType.LAMENT_DRAFT_SERVER_ACTION, lamentDraftCards: LamentCard[]; }
     | { type: ServerMessageType.LAMENT_DRAFT_END, playerHand: (ItemCard | LamentCard)[], opponentHand: (ItemCard | LamentCard)[]; }
     | { type: ServerMessageType.PLAYER_ACTIONS_FINISHED }
-    | { type: ServerMessageType.PLAYER_TAKES_ACTIONS }
-    | { type: ServerMessageType.PLAYER_WAITS }
+    | { type: ServerMessageType.PLAYER_TAKES_ACTIONS, hasInitiative: boolean }
+    | { type: ServerMessageType.PLAYER_WAITS, hasInitiative: boolean }
     | { type: ServerMessageType.OPPONENT_PLAYED_CARD, opponentHand: (ItemCard | LamentCard)[], resource: number, itemType: ItemTypes; }
     | { type: ServerMessageType.OPPONENT_DESTROYED_CARD, index: number }
     | { type: ServerMessageType.OPPONENT_COLLECTED_RESOURCES, resource: number }
