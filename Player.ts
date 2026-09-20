@@ -21,7 +21,7 @@ export class Player {
     }
 
     public removeCardFromHand() {
-        for(let i=this.hand.length-1;i>=0;i--) {
+        for(let i = this.hand.length - 1; i >= 0; i--) {
             if(this.hand[i].type === CardTypes.ITEM) {
                 this.hand.splice(i, 1);
                 break;

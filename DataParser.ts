@@ -36,7 +36,7 @@ export type ClientDataParser =
     | ({ type: ClientMessageType.ENTER } & PlayerContext)
     | { type: ClientMessageType.CLOSE }
     | ({ type: ClientMessageType.PLAY_CARD, resource: number, itemType: ItemTypes } & PlayerContext)
-    | ({ type: ClientMessageType.DESTROY_CARD, index: number } & PlayerContext)
+    | ({ type: ClientMessageType.DESTROY_CARD, index: number, itemType: ItemTypes } & PlayerContext)
     | ({ type: ClientMessageType.COLLECT_RESOURCES, resource: number } & PlayerContext)
     | ({ type: ClientMessageType.PASS_TURN } & PlayerContext)
     | ({ type: ClientMessageType.LAMENT_DRAFT_PLAYER_ACTION, pickCardType: LamentTypes, discardCardType: LamentTypes } & PlayerContext)

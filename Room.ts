@@ -3,7 +3,7 @@ import {WebSocket} from "ws";
 import {ServerDataParser, ServerMessageType} from "./DataParser";
 import {ItemCard} from "./card/ItemCard";
 import {LamentCard} from "./card/LamentCard";
-import {CardTypes, LamentTypes} from "./card/CardTypes";
+import {CardTypes, ItemTypes, LamentTypes} from "./card/CardTypes";
 import {Card} from "./card/Card";
 import {DivinityCard} from "./card/DivinityCard";
 
@@ -182,6 +182,11 @@ export class Room {
                 break;
         }
         return deck;
+    }
+
+    public putBackDestroyedCardToDeck(itemType: ItemTypes) {
+        this.itemDeck.push(new ItemCard(itemType));
+        this.shuffleDeck(this.itemDeck);
     }
 
     private shuffleDeck(deck: Card[]) {

@@ -35,8 +35,9 @@ export class Server {
                 case ClientMessageType.DESTROY_CARD:
                     const destroyData: ServerDataParser = {
                         type: ServerMessageType.OPPONENT_DESTROYED_CARD,
-                        index: message.index,
+                        index: message.index
                     };
+                    this.room.get(message.roomId)!.putBackDestroyedCardToDeck(message.itemType);
                     this.room.get(message.roomId)!.getOpponent(message.playerName)!.socket.send(JSON.stringify(destroyData));
                     break;
 
