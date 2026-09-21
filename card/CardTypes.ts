@@ -4,8 +4,16 @@ export enum CardTypes {
     ITEM
 }
 
+export enum ActionTypes {
+    GENERATOR_1,
+    GENERATOR_2,
+    COMPANION,
+    DESTROY,
+    NONE
+}
+
 export enum DivinityTypes {
-    UNKNOWN = -1,
+    NONE = -1,
     WISDOM,
     STRENGTH,
     FREEDOM,
@@ -29,9 +37,50 @@ export enum LamentTypes {
 
 export enum ItemTypes {
     UNKNOWN = -1,
-    BOOK,
-    HOURGLASS,
-    PYRAMID,
-    QUIVER,
-    SHOES
+    BLUE_GOBLET,
+    BLUE_HEART,
+    BLUE_HOURGLASS,
+    BLUE_MASK,
+    BLUE_SCISSORS,
+    BLUE_TORCH,
+    BLUE_WAND,
+    BROWN_BOOK,
+    BROWN_KEY,
+    BROWN_MONOCLE,
+    BROWN_PEN,
+    BROWN_PIPE,
+    BROWN_PUPPER,
+    BROWN_STAFF,
+    GREEN_ARMOUR,
+    GREEN_BOW,
+    GREEN_CEREMONIAL,
+    GREEN_COMPANION,
+    GREEN_GAUNTLET,
+    GREEN_QUIVER,
+    GREEN_SWORD,
+    ORANGE_CLOTH,
+    ORANGE_GLASSES,
+    ORANGE_PYRAMID,
+    ORANGE_SCEPTER,
+    ORANGE_SPHERE,
+    ORANGE_TALISMAN,
+    ORANGE_THREADS,
+    RED_DAGGER,
+    RED_GREATSWORD,
+    RED_KNIFE,
+    RED_NEEDLES,
+    RED_SCYTHE,
+    RED_SHACKLE,
+    RED_STILETTO,
+    TEAL_BRACELET,
+    TEAL_DOMINO,
+    TEAL_DRESS,
+    TEAL_EARRINGS,
+    TEAL_SARCOPHAGUS,
+    TEAL_SHOES,
+    TEAL_WHIP,
+    HYMN_1,
+    HYMN_2,
+    HYMN_3,
+    HYMN_4,
 }

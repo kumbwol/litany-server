@@ -53,14 +53,29 @@ export class Server {
                     this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
 
                     if(this.room.get(message.roomId)!.getOpponent(message.playerName)!.willDoAction) {
+                        const playerWhoTookAction = this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+                        const playerWhoWaits = this.room.get(message.roomId)!.getPlayer(message.playerName);
+
+                        const hasActivePlayerMatchingLament = this.room.get(message.roomId)!.hasPlayerMatchingLamentCardWithDivinity(playerWhoTookAction);
+
+                        const card = (hasActivePlayerMatchingLament ? this.room.get(message.roomId)!.getItemDeck().pop()! : undefined);
+
+                        if(hasActivePlayerMatchingLament) {
+                            playerWhoTookAction.hand.push(card);
+                        }
+
                         const playerTakesAction: ServerDataParser = {
                             type: ServerMessageType.PLAYER_TAKES_ACTIONS,
-                            hasInitiative: this.room.get(message.roomId)!.getOpponent(message.playerName)!.hasInitiative
+                            hasInitiative: false,
+                            lamentDraw: card,
+                            lamentResources: hasActivePlayerMatchingLament ? 3 : 0,
                         };
 
                         const playerWaits: ServerDataParser = {
                             type: ServerMessageType.PLAYER_WAITS,
-                            hasInitiative: this.room.get(message.roomId)!.getPlayer(message.playerName).hasInitiative
+                            hasInitiative: true,
+                            opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWhoTookAction),
+                            opponentResources: hasActivePlayerMatchingLament ? 3 : 0
                         };
 
                         this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = undefined;
@@ -76,7 +91,7 @@ export class Server {
                             this.room.get(message.roomId)!.getPlayer(message.playerName)!.removeLamentCardsFromHand();
                             this.room.get(message.roomId)!.getOpponent(message.playerName)!.removeLamentCardsFromHand();
                             this.room.get(message.roomId)!.shuffleLamentCards();
-                            this.room.get(message.roomId)!.lamentDeck.pop();
+                            this.room.get(message.roomId)!.getLamentDeck().pop();
 
                             const playerHasInitiative = this.room.get(message.roomId)!.getPlayer(message.playerName)!.hasInitiative;
                             const playerWithInitiative = playerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName)! : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
@@ -158,7 +173,7 @@ export class Server {
                             this.room.get(message.roomId)!.getPlayer(message.playerName)!.removeLamentCardsFromHand();
                             this.room.get(message.roomId)!.getOpponent(message.playerName)!.removeLamentCardsFromHand();
                             this.room.get(message.roomId)!.shuffleLamentCards();
-                            this.room.get(message.roomId)!.lamentDeck.pop();
+                            this.room.get(message.roomId)!.getLamentDeck().pop();
 
                             const playerHasInitiative = this.room.get(message.roomId)!.getPlayer(message.playerName)!.hasInitiative;
                             const playerWithInitiative = playerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName)! : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
@@ -229,14 +244,29 @@ export class Server {
                     if(isPlayerTookAction && isOpponentTookAction) {
                         const isPlayerHasInitiative = this.room.get(message.roomId)!.getPlayer(message.playerName).hasInitiative;
 
+                        const playerWhoTookAction = isPlayerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName) : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+                        const playerWhoWaits = !isPlayerHasInitiative ? this.room.get(message.roomId)!.getPlayer(message.playerName) : this.room.get(message.roomId)!.getOpponent(message.playerName)!;
+
+                        const hasActivePlayerMatchingLament = this.room.get(message.roomId)!.hasPlayerMatchingLamentCardWithDivinity(playerWhoTookAction);
+
+                        const card = (hasActivePlayerMatchingLament ? this.room.get(message.roomId)!.getItemDeck().pop()! : undefined);
+
+                        if(hasActivePlayerMatchingLament) {
+                            playerWhoTookAction.hand.push(card);
+                        }
+
                         const playerTakesAction: ServerDataParser = {
                             type: ServerMessageType.PLAYER_TAKES_ACTIONS,
                             hasInitiative: true,
+                            lamentDraw: card,
+                            lamentResources: hasActivePlayerMatchingLament ? 3 : 0,
                         };
 
                         const playerWaits: ServerDataParser = {
                             type: ServerMessageType.PLAYER_WAITS,
                             hasInitiative: false,
+                            opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWhoTookAction),
+                            opponentResources: hasActivePlayerMatchingLament ? 3 : 0
                         };
 
                         this.room.get(message.roomId)!.getPlayer(message.playerName).willDoAction = true;
