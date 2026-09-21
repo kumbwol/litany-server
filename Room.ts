@@ -3,7 +3,7 @@ import {WebSocket} from "ws";
 import {ServerDataParser, ServerMessageType} from "./DataParser";
 import {ItemCard} from "./card/ItemCard";
 import {LamentCard} from "./card/LamentCard";
-import {CardTypes, ItemTypes, LamentTypes} from "./card/CardTypes";
+import {CardTypes, DivinityTypes, ItemTypes, LamentTypes} from "./card/CardTypes";
 import {Card} from "./card/Card";
 import {DivinityCard} from "./card/DivinityCard";
 
@@ -19,6 +19,18 @@ export class Room {
 
     constructor() {
 
+    }
+
+    public hasPlayerMatchingLamentCardWithDivinity(player: Player): boolean {
+        for(let i=0; i<player.hand.length; i++) {
+            if(player.hand[i].type === CardTypes.LAMENT) {
+                if((player.hand[i] as LamentCard).divinityType === this.divinityDeck[this.roundId].divinityType) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public shouldLamentDraftStart() {
@@ -139,6 +151,10 @@ export class Room {
             }
         }
         return obfuscatedHand;
+    }
+
+    public getItemDeck(): ItemCard[] {
+        return this.itemDeck;
     }
 
     public getLamentDeck(): LamentCard[] {

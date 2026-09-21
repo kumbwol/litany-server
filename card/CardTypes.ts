@@ -11,7 +11,8 @@ export enum DivinityTypes {
     FREEDOM,
     KNOWLEDGE,
     SCHEMES,
-    SUBJECTION
+    SUBJECTION,
+    JOKER
 }
 
 export enum LamentTypes {
