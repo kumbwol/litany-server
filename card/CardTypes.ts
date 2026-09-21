@@ -13,7 +13,7 @@ export enum ActionTypes {
 }
 
 export enum DivinityTypes {
-    NONE = -1,
+    UNKNOWN = -1,
     WISDOM,
     STRENGTH,
     FREEDOM,

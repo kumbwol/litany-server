@@ -5,6 +5,7 @@ import {WebSocket} from "ws";
 import {Room} from "./Room";
 import {Player} from "./Player";
 import {LamentCard} from "./card/LamentCard";
+import {ItemCard} from "./card/ItemCard";
 
 export class Server {
     private room = new Map<string, Room>();
@@ -61,7 +62,7 @@ export class Server {
                         const card = (hasActivePlayerMatchingLament ? this.room.get(message.roomId)!.getItemDeck().pop()! : undefined);
 
                         if(hasActivePlayerMatchingLament) {
-                            playerWhoTookAction.hand.push(card);
+                            playerWhoTookAction.hand.push(card as ItemCard);
                         }
 
                         const playerTakesAction: ServerDataParser = {
@@ -106,7 +107,7 @@ export class Server {
 
                             const newLamentDraftPassive: ServerDataParser = {
                                 type: ServerMessageType.NEW_LAMENT_DRAFT,
-                                lamentDraftCards: this.room.get(message.roomId)!.getObfuscatedCards(this.room.get(message.roomId)!.getLamentDeck()),
+                                lamentDraftCards: this.room.get(message.roomId)!.getObfuscatedCards(this.room.get(message.roomId)!.getLamentDeck()) as LamentCard[],
                                 playerHand: playerWithPassive.hand,
                                 opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWithInitiative),
                             };
@@ -188,7 +189,7 @@ export class Server {
 
                             const newLamentDraftPassive: ServerDataParser = {
                                 type: ServerMessageType.NEW_LAMENT_DRAFT,
-                                lamentDraftCards: this.room.get(message.roomId)!.getObfuscatedCards(this.room.get(message.roomId)!.getLamentDeck()),
+                                lamentDraftCards: this.room.get(message.roomId)!.getObfuscatedCards(this.room.get(message.roomId)!.getLamentDeck()) as LamentCard[],
                                 playerHand: playerWithPassive.hand,
                                 opponentHand: this.room.get(message.roomId)!.getObfuscatedOpponentCards(playerWithInitiative),
                             };
@@ -217,7 +218,7 @@ export class Server {
                         const card = (hasActivePlayerMatchingLament ? this.room.get(message.roomId)!.getItemDeck().pop()! : undefined);
 
                         if(hasActivePlayerMatchingLament) {
-                            playerWhoTookAction.hand.push(card);
+                            playerWhoTookAction.hand.push(card as ItemCard);
                         }
 
                         const playerTakesAction: ServerDataParser = {
@@ -252,7 +253,7 @@ export class Server {
                         const card = (hasActivePlayerMatchingLament ? this.room.get(message.roomId)!.getItemDeck().pop()! : undefined);
 
                         if(hasActivePlayerMatchingLament) {
-                            playerWhoTookAction.hand.push(card);
+                            playerWhoTookAction.hand.push(card as ItemCard);
                         }
 
                         const playerTakesAction: ServerDataParser = {
